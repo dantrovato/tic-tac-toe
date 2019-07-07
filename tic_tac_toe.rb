@@ -1,3 +1,5 @@
+require 'pry'
+
 class Board
   INITIAL_MARKER = ' '
 
@@ -13,6 +15,22 @@ class Board
   def set_square_at(square, marker)
     @squares[square] = marker
   end
+
+  def [](index)
+    squares[index]
+  end
+
+  def empty_squares_keys
+    squares.keys.select { |key| @squares[key].unmarked? }
+  end
+
+  def full?
+    empty_squares_keys.empty?
+  end
+
+  # private
+
+  attr_reader :squares, :marker
 end
 
 class Square
@@ -23,11 +41,15 @@ class Square
   def to_s
     @marker
   end
+
+  def unmarked?
+    @marker == Board::INITIAL_MARKER
+  end
 end
 
 class TTTGame
   HUMAN_MARKER = 'X'
-
+  COMPUTER_MARKER = 'O'
   attr_reader :board
 
   def initialize
@@ -59,29 +81,35 @@ class TTTGame
   end
 
   def human_moves
-    puts "Choose square 1-9"
+    # binding.pry
+    puts "Choose square #{board.empty_squares_keys}"
     square = nil
     loop do
       square = gets.chomp.to_i
-      break if (1..9).include?(square)
+      break if board.empty_squares_keys.include?(square)
       puts "Invalid choice"
     end
 
     board.set_square_at(square, Square.new(HUMAN_MARKER))
   end
 
+  def computer_moves
+    square = board.empty_squares_keys.sample
+    board.set_square_at(square, Square.new(COMPUTER_MARKER))
+  end
+
   def play
     display_welcome_message
-    # loop do
+    loop do
       display_board
       human_moves
+      break if board.full? # || someone_won?
+
+      computer_moves
+      break if board.full? # || someone_won?
       display_board
-    #   break if someone_won? || board_full?
-    #
-    #   computer_moves
-    #   break if someone_won? || board_full?
-    # end
-    # display_result
+    end
+     # display_result
     display_goodbye_message
   end
 end
