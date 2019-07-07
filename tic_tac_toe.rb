@@ -1,6 +1,9 @@
 require 'pry'
 
 class Board
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                  [[1, 5, 9], [3, 5, 7]]
   INITIAL_MARKER = ' '
 
   def initialize
@@ -28,12 +31,35 @@ class Board
     empty_squares_keys.empty?
   end
 
+  def someone_won?
+    !!detect_winner
+  end
+
+  # return marker or nil
+  def detect_winner
+    WINNING_LINES.each do |line|
+      # binding.pry
+      if (@squares[line[0]].marker == TTTGame::HUMAN_MARKER &&
+      @squares[line[1]].marker == TTTGame::HUMAN_MARKER &&
+      @squares[line[2]].marker == TTTGame::HUMAN_MARKER )
+        return TTTGame::HUMAN_MARKER
+      elsif (@squares[line[0]].marker == TTTGame::COMPUTER_MARKER &&
+      @squares[line[1]].marker == TTTGame::COMPUTER_MARKER &&
+      @squares[line[2]].marker == TTTGame::COMPUTER_MARKER )
+        return TTTGame::COMPUTER_MARKER
+      end
+    end
+    nil
+  end
+
   # private
 
-  attr_reader :squares, :marker
+  attr_reader :squares
 end
 
 class Square
+  attr_reader :marker
+
   def initialize(marker)
     @marker = marker
   end
@@ -98,18 +124,28 @@ class TTTGame
     board.set_square_at(square, Square.new(COMPUTER_MARKER))
   end
 
+  def display_result
+    if board.detect_winner == HUMAN_MARKER
+      puts "You won!"
+    elsif board.detect_winner == COMPUTER_MARKER
+      puts "Computer won!"
+    else
+      puts "It's a tie!"
+    end
+  end
+
   def play
     display_welcome_message
     loop do
       display_board
       human_moves
-      break if board.full? # || someone_won?
+      break if board.full? || board.someone_won?
 
       computer_moves
-      break if board.full? # || someone_won?
-      display_board
+      break if board.full? || board.someone_won?
     end
-     # display_result
+    display_board
+    display_result
     display_goodbye_message
   end
 end
