@@ -39,13 +39,13 @@ class Board
   def detect_winner
     WINNING_LINES.each do |line|
       # binding.pry
-      if (@squares[line[0]].marker == TTTGame::HUMAN_MARKER &&
-      @squares[line[1]].marker == TTTGame::HUMAN_MARKER &&
-      @squares[line[2]].marker == TTTGame::HUMAN_MARKER )
+      if (squares[line[0]].marker == TTTGame::HUMAN_MARKER &&
+      squares[line[1]].marker == TTTGame::HUMAN_MARKER &&
+      squares[line[2]].marker == TTTGame::HUMAN_MARKER )
         return TTTGame::HUMAN_MARKER
-      elsif (@squares[line[0]].marker == TTTGame::COMPUTER_MARKER &&
-      @squares[line[1]].marker == TTTGame::COMPUTER_MARKER &&
-      @squares[line[2]].marker == TTTGame::COMPUTER_MARKER )
+      elsif (squares[line[0]].marker == TTTGame::COMPUTER_MARKER &&
+      squares[line[1]].marker == TTTGame::COMPUTER_MARKER &&
+      squares[line[2]].marker == TTTGame::COMPUTER_MARKER )
         return TTTGame::COMPUTER_MARKER
       end
     end
@@ -119,9 +119,41 @@ class TTTGame
     board.set_square_at(square, Square.new(HUMAN_MARKER))
   end
 
+  def computer_defends
+    Board::WINNING_LINES.each do |line|
+      # binding.pry
+      if (board.squares[line[0]].marker == HUMAN_MARKER &&
+        board.squares[line[1]].marker == HUMAN_MARKER &&
+        board.squares[line[2]].marker == Board::INITIAL_MARKER)
+        board.set_square_at(line[2], Square.new(COMPUTER_MARKER))
+      elsif (board.squares[line[0]].marker == HUMAN_MARKER &&
+        board.squares[line[2]].marker == HUMAN_MARKER &&
+        board.squares[line[1]].marker == Board::INITIAL_MARKER)
+        board.set_square_at(line[1], Square.new(COMPUTER_MARKER))
+      elsif (board.squares[line[2]].marker == HUMAN_MARKER &&
+        board.squares[line[1]].marker == HUMAN_MARKER &&
+        board.squares[line[0]].marker == Board::INITIAL_MARKER)
+        board.set_square_at(line[0], Square.new(COMPUTER_MARKER))
+      end
+    end
+  end
+
   def computer_moves
     square = board.empty_squares_keys.sample
     board.set_square_at(square, Square.new(COMPUTER_MARKER))
+  end
+
+  # checks if two squares in a line are a human marker. if they are and the third
+  # marker is an initial marker then marks the initial marker with a computer marker
+  def computer_moves
+    computer_defends
+    Board::WINNING_LINES.each do |line|
+      if board.squares.count(HUMAN_MARKER) >= board.squares.count(COMPUTER_MARKER)
+        square = board.empty_squares_keys.sample
+        board.set_square_at(square, Square.new(COMPUTER_MARKER))
+        return
+      end
+    end
   end
 
   def display_result
