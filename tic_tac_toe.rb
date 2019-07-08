@@ -157,10 +157,10 @@ class TTTGame
     end
   end
 
-  def computer_moves
-    square = board.empty_squares_keys.sample
-    board.set_square_at(square, Square.new(COMPUTER_MARKER))
-  end
+  # def computer_moves
+  #   square = board.empty_squares_keys.sample
+  #   board.set_square_at(square, Square.new(COMPUTER_MARKER))
+  # end
 
   # checks if two squares in a line are a human marker. if they are and the third
   # marker is an initial marker then marks the initial marker with a computer marker
@@ -168,7 +168,9 @@ class TTTGame
     computer_attacks
     computer_defends
     Board::WINNING_LINES.each do |line|
-      if board.squares.count(HUMAN_MARKER) >= board.squares.count(COMPUTER_MARKER)
+      if board.squares[5].marker == Board::INITIAL_MARKER
+        board.set_square_at(5, Square.new(COMPUTER_MARKER))
+      elsif board.squares.count(HUMAN_MARKER) > board.squares.count(COMPUTER_MARKER)
         square = board.empty_squares_keys.sample
         board.set_square_at(square, Square.new(COMPUTER_MARKER))
         return
