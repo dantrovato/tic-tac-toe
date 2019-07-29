@@ -107,7 +107,6 @@ class TTTGame
   end
 
   def human_moves
-    # binding.pry
     puts "Choose square #{board.empty_squares_keys}"
     square = nil
     loop do
@@ -140,7 +139,6 @@ class TTTGame
 
   def computer_attacks
     Board::WINNING_LINES.each do |line|
-      # binding.pry
       if (board.squares[line[0]].marker == COMPUTER_MARKER &&
         board.squares[line[1]].marker == COMPUTER_MARKER &&
         board.squares[line[2]].marker == Board::INITIAL_MARKER)
@@ -167,14 +165,12 @@ class TTTGame
   def computer_moves
     computer_attacks
     computer_defends
-    Board::WINNING_LINES.each do |line|
-      if board.squares[5].marker == Board::INITIAL_MARKER
-        board.set_square_at(5, Square.new(COMPUTER_MARKER))
-      elsif board.squares.count(HUMAN_MARKER) > board.squares.count(COMPUTER_MARKER)
-        square = board.empty_squares_keys.sample
-        board.set_square_at(square, Square.new(COMPUTER_MARKER))
-        return
-      end
+    if board.squares[5].marker == Board::INITIAL_MARKER
+      board.set_square_at(5, Square.new(COMPUTER_MARKER))
+    elsif board.squares.values.count { |square| square.marker == 'X' } > board.squares.values.count { |square| square.marker == 'O' }
+      square = board.empty_squares_keys.sample
+      board.set_square_at(square, Square.new(COMPUTER_MARKER))
+      return
     end
   end
 
